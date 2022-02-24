@@ -22,5 +22,6 @@ npm install nodemon@1
 ### Start Application
 
 ```
+npm install
 npm run live
 ```
