@@ -15,7 +15,7 @@ class DisplayHomePage extends React.Component {
           <div className="mx-auto align-middle text-center">
             <p className="text-muted">Build by Ding Ming A0241574E</p>
             <a
-              href="https://github.com/RayLate/bookingsystemenhenced"
+              href="https://github.com/RayLate/bookingsystemwithreact"
               className="text-primary"
             >
               Git Repository
