@@ -1,0 +1,42 @@
+scalar GraphQLDate
+
+type Booking {
+  _id: ID!
+  id: Int!
+  sn: Int!
+  name: String!
+  phone: String!
+  timestamp: GraphQLDate!
+}
+
+type BlackListEntry {
+  _id: ID!
+  id: Int!
+  name: String
+  phone: String
+  timestamp: GraphQLDate!
+}
+
+input BookingInputs {
+  name: String!
+  phone: String!
+}
+
+input BlackListInputs {
+  name: String
+  phone: String
+}
+
+type Query {
+  getBooking(sn: Int!): Booking
+  getBookingList: [Booking!]!
+  getBlackList: [BlackListEntry!]!
+}
+
+type Mutation {
+  addBooking(booking: BookingInputs!): Booking!
+  deleteBooking(sn: Int!): String
+  clearBookings: String
+
+  addBlackList(blacklist: BlackListInputs!): BlackListEntry!
+}
