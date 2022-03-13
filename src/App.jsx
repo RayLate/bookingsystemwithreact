@@ -5,6 +5,9 @@ function jsonDateReviver(key, value) {
   return value;
 }
 
+const gitURL =
+  "https://github.com/RayLate/bookingsystemwithreact/tree/tutorial4";
+
 async function graphQLFetch(query, variables = {}) {
   try {
     const response = await fetch("/graphql", {
@@ -47,10 +50,7 @@ class DisplayHomePage extends React.Component {
         <div className="footer bg-light border border-grey d-flex align-items-center">
           <div className="mx-auto align-middle text-center">
             <p className="text-muted">Build by Ding Ming A0241574E</p>
-            <a
-              href="https://github.com/RayLate/bookingsystemwithreact"
-              className="text-primary"
-            >
+            <a href={gitURL} className="text-primary">
               Git Repository
             </a>
           </div>

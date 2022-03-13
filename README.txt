@@ -3,5 +3,7 @@ To use this application
 1) install node.js on your docker VM from https://github.com/nvm-sh/nvm
 2) you must have mongodb installed and the "mongo" is added to your environmental variables
 3) git clone https://github.com/RayLate/bookingsystemwithreact.git
-4) cd bookingsystemwithreact
-5) follow command lines in commands.md
+4) git checkout tutorial4
+5) git pull
+6) cd bookingsystemwithreact
+7) follow command lines in commands.md

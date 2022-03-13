@@ -39,6 +39,8 @@ function jsonDateReviver(key, value) {
   return value;
 }
 
+var gitURL = "https://github.com/RayLate/bookingsystemwithreact/tree/tutorial4";
+
 function graphQLFetch(_x) {
   return _graphQLFetch.apply(this, arguments);
 }
@@ -141,7 +143,7 @@ var DisplayHomePage = /*#__PURE__*/function (_React$Component) {
       }, /*#__PURE__*/React.createElement("p", {
         className: "text-muted"
       }, "Build by Ding Ming A0241574E"), /*#__PURE__*/React.createElement("a", {
-        href: "https://github.com/RayLate/bookingsystemwithreact",
+        href: gitURL,
         className: "text-primary"
       }, "Git Repository"))));
     }
