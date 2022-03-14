@@ -9,7 +9,7 @@ scripts manually.
 ## Test Database
 ```
 npm install
-npm testDB
+npm run testDB
 ```
 
 ### Start Application
