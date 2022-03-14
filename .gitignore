@@ -358,4 +358,4 @@ package-lock.json
 *.pdf
 
 # Compiled file
-App.js
+**/App.js
