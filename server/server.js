@@ -212,7 +212,7 @@ server.applyMiddleware({ app, path: "/graphql" });
     app.listen(PORT, function () {
       console.log(`App started on port localhost:${PORT}`);
     });
-  } catch (e) {
+  } catch (err) {
     console.error("ERROR:", err);
   }
 })();
