@@ -16,6 +16,6 @@ npm run testDB
 
 ```
 npm install
-mongo travllerinfo scripts/init.mongo.js
+mongo travellerinfo scripts/init.mongo.js
 npm run live
 ```

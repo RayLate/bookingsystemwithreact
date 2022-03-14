@@ -66,6 +66,7 @@ class BookingSystem extends React.Component {
     this.addBooking = this.addBooking.bind(this);
     this.removeBooking = this.removeBooking.bind(this);
     this.searchBooking = this.searchBooking.bind(this);
+    this.clearBookings = this.clearBookings.bind(this);
   }
 
   componentDidMount() {
@@ -153,6 +154,7 @@ class BookingSystem extends React.Component {
           <div className="col col-lg-6 col-md-12">
             <DisplayFreeSeats
               bookings={this.state.bookings.sort((a, b) => a.sn - b.sn)}
+              clearBookings={this.clearBookings}
             />
           </div>
           <div className="col col-lg-6 col-md-12 mt-md-10">
@@ -309,16 +311,16 @@ function DisplayFreeSeats(props) {
   return (
     <>
       <div className="container bg-light rounded-3">
-        <div className="row" align="center">
+        <div className="row py-3" align="center">
           <h1 className="display-5 fw-bold">
             {props.bookings.length == 25
               ? "Fully Booked"
               : `Seats Available = ${25 - props.bookings.length}`}
           </h1>
         </div>
-        <div className="p-3">
+        <div className="pb-3">
           <div className="row p-3">{seats}</div>
-          <div className="row">
+          <div className="row mb-3">
             <div className="col-3"></div>
             <div className="col-3 ">
               <div className="d-flex flex-row">
@@ -333,6 +335,15 @@ function DisplayFreeSeats(props) {
               </div>
             </div>
             <div className="col-3"></div>
+          </div>
+          <div className="row">
+            <button
+              type="button"
+              className="btn btn-dark"
+              onClick={props.clearBookings}
+            >
+              Clear all bookings
+            </button>
           </div>
         </div>
       </div>
