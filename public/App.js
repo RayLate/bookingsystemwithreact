@@ -71,7 +71,7 @@ var DisplayHomePage = /*#__PURE__*/function (_React$Component) {
       }, /*#__PURE__*/React.createElement("p", {
         className: "text-muted"
       }, "Build by Ding Ming A0241574E"), /*#__PURE__*/React.createElement("a", {
-        href: "https://github.com/RayLate/bookingsystemwithreact",
+        href: "#",
         className: "text-primary"
       }, "Git Repository"))));
     }
@@ -97,7 +97,6 @@ var BookingSystem = /*#__PURE__*/function (_React$Component2) {
     _this.addBooking = _this.addBooking.bind(_assertThisInitialized(_this));
     _this.removeBooking = _this.removeBooking.bind(_assertThisInitialized(_this));
     _this.searchBooking = _this.searchBooking.bind(_assertThisInitialized(_this));
-    _this.clearBookings = _this.clearBookings.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -135,11 +134,6 @@ var BookingSystem = /*#__PURE__*/function (_React$Component2) {
         return;
       }
 
-      if (this.checkDuplicateBookings(booking.name, booking.phone)) {
-        alert("Duplicated Entry");
-        return;
-      }
-
       var newBooking = _objectSpread(_objectSpread({}, booking), {}, {
         sn: this.getFirstAvailableId()
       });
@@ -149,21 +143,6 @@ var BookingSystem = /*#__PURE__*/function (_React$Component2) {
       this.setState({
         bookings: newBookings
       });
-    }
-  }, {
-    key: "checkDuplicateBookings",
-    value: function checkDuplicateBookings(name, phone) {
-      var bookingSearchedbyname = this.state.bookings.find(function (booking) {
-        return booking.name == name;
-      });
-
-      if (bookingSearchedbyname) {
-        if (bookingSearchedbyname.phone == phone) {
-          return true;
-        }
-      }
-
-      return false;
     }
   }, {
     key: "searchBooking",
@@ -185,13 +164,6 @@ var BookingSystem = /*#__PURE__*/function (_React$Component2) {
       });
     }
   }, {
-    key: "clearBookings",
-    value: function clearBookings() {
-      this.setState({
-        bookings: []
-      });
-    }
-  }, {
     key: "render",
     value: function render() {
       return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
@@ -201,8 +173,7 @@ var BookingSystem = /*#__PURE__*/function (_React$Component2) {
       }, /*#__PURE__*/React.createElement(DisplayFreeSeats, {
         bookings: this.state.bookings.sort(function (a, b) {
           return a.sn - b.sn;
-        }),
-        clearBookings: this.clearBookings
+        })
       })), /*#__PURE__*/React.createElement("div", {
         className: "col col-lg-6 col-md-12 mt-md-10"
       }, /*#__PURE__*/React.createElement("nav", null, /*#__PURE__*/React.createElement("div", {
@@ -325,16 +296,16 @@ function DisplayFreeSeats(props) {
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "container bg-light rounded-3"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "row py-3",
+    className: "row",
     align: "center"
   }, /*#__PURE__*/React.createElement("h1", {
     className: "display-5 fw-bold"
   }, props.bookings.length == 25 ? "Fully Booked" : "Seats Available = ".concat(25 - props.bookings.length))), /*#__PURE__*/React.createElement("div", {
-    className: "pb-3"
+    className: "p-3"
   }, /*#__PURE__*/React.createElement("div", {
     className: "row p-3"
   }, seats), /*#__PURE__*/React.createElement("div", {
-    className: "row mb-3"
+    className: "row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "col-3"
   }), /*#__PURE__*/React.createElement("div", {
@@ -351,13 +322,7 @@ function DisplayFreeSeats(props) {
     className: "legend"
   }), /*#__PURE__*/React.createElement("span", null, "Available"))), /*#__PURE__*/React.createElement("div", {
     className: "col-3"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "row"
-  }, /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "btn btn-dark",
-    onClick: props.clearBookings
-  }, "Clear all bookings")))));
+  })))));
 }
 
 var AddTraveller = /*#__PURE__*/function (_React$Component3) {
@@ -499,7 +464,7 @@ var DeleteTraveller = /*#__PURE__*/function (_React$Component4) {
         this.setState(_objectSpread(_objectSpread({}, this.state), {}, {
           searchError: true
         }));
-        window.alert("Search Error, ".concat(searchForm.sn.value, " cannot be found or not booked."));
+        window.alert("Search Error, ".concat(searchForm.sn.value, " cannot be found."));
       }
     }
   }, {
