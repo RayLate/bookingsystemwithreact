@@ -356,3 +356,6 @@ package-lock.json
 
 # exclude pdf
 *.pdf
+
+# Compiled file
+App.js
