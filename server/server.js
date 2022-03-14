@@ -111,16 +111,17 @@ async function addBooking(_, { booking }) {
 
   const blacklist = await getBlackList();
   if (
-    blacklist.find(
-      (blacklistEntry) =>
-        blacklistEntry.name === booking.name ||
-        blacklistEntry.phone === booking.phone
-    )
+    blacklist.find((blacklistEntry) => blacklistEntry.name === booking.name)
   ) {
     throw new ForbiddenError(
-      `"${
-        booking.name || booking.phone
-      }" is on blacklist, barred from travelling`
+      `"NAME: ${booking.name}" is on the blacklist, barred from travelling`
+    );
+  }
+  if (
+    blacklist.find((blacklistEntry) => blacklistEntry.phone === booking.phone)
+  ) {
+    throw new ForbiddenError(
+      `PHONE: "${booking.phone}" is on the blacklist, barred from travelling`
     );
   }
 
