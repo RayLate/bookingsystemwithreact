@@ -1,10 +1,46 @@
+const dateRegex = new RegExp("^\\d\\d\\d\\d-\\d\\d-\\d\\d");
+
+function jsonDateReviver(key, value) {
+  if (dateRegex.test(value)) return new Date(value);
+  return value;
+}
+
+const gitURL =
+  "https://github.com/RayLate/bookingsystemwithreact/tree/tutorial4";
+
+async function graphQLFetch(query, variables = {}) {
+  try {
+    const response = await fetch("/graphql", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, variables }),
+    });
+    const body = await response.text();
+    const result = JSON.parse(body, jsonDateReviver);
+    if (result.errors) {
+      const error = result.errors[0];
+      if (error.extensions.code == "BAD_USER_INPUT") {
+        const details = error.extensions.exception.errors.join("\n ");
+        alert(`${error.message}:\n ${details}`);
+      } else if (error.extensions.code == "FORBIDDEN") {
+        alert(error.message);
+      } else {
+        alert(`${error.extensions.code}: ${error.message}`);
+      }
+    }
+    return result.data;
+  } catch (err) {
+    alert(`${error.extension.code}: ${err.message}`);
+  }
+}
+
 class DisplayHomePage extends React.Component {
   render() {
     return (
       <>
         <nav className="navbar navbar-dark bg-dark px-5 py-3">
           <h5 className="text-white">High-Speed Railway Reservation System</h5>
-          <span className="text-muted">IT5007 Tutorial 3</span>
+          <span className="text-muted">IT5007 Tutorial 4</span>
         </nav>
         <div className="container my-5">
           <div className="flex">
@@ -14,10 +50,7 @@ class DisplayHomePage extends React.Component {
         <div className="footer bg-light border border-grey d-flex align-items-center">
           <div className="mx-auto align-middle text-center">
             <p className="text-muted">Build by Ding Ming A0241574E</p>
-            <a
-              href="https://github.com/RayLate/bookingsystemwithreact"
-              className="text-primary"
-            >
+            <a href={gitURL} className="text-primary">
               Git Repository
             </a>
           </div>
@@ -35,44 +68,82 @@ class BookingSystem extends React.Component {
     this.searchBooking = this.searchBooking.bind(this);
   }
 
-  isFull() {
-    return this.state.bookings.length == 25;
+  componentDidMount() {
+    this.loadData();
   }
 
-  getFirstAvailableId() {
-    for (let index = 1; index < 26; index++) {
-      if (
-        this.state.bookings.find((booking) => booking.sn == index) === undefined
-      ) {
-        return index;
+  async loadData() {
+    const query = `query {
+      getBookingList
+      {
+        sn
+        name
+        phone
+        timestamp
       }
+    }`;
+
+    const data = await graphQLFetch(query);
+    console.log(data);
+    if (data) {
+      this.setState({ bookings: data.getBookingList });
     }
   }
 
-  addBooking(booking) {
-    if (this.isFull()) {
-      alert("All seats are booked");
-      return;
+  async addBooking(booking) {
+    const query = `mutation addbook($booking: BookingInputs!){
+      addBooking(booking: $booking)
+      {
+        sn
+        name
+        phone
+        timestamp
+      }
+    }`;
+
+    const data = await graphQLFetch(query, { booking });
+    if (data) {
+      this.loadData();
     }
-    const newBooking = { ...booking, sn: this.getFirstAvailableId() };
-    const newBookings = [...this.state.bookings, newBooking];
-    console.log(newBookings);
-    this.setState({ bookings: newBookings });
   }
 
-  searchBooking(sn) {
-    console.log(sn);
-    const searchBooking = this.state.bookings.find(
-      (booking) => booking.sn == sn
-    );
-    return searchBooking;
+  async searchBooking(sn) {
+    const query = `query getBooking($sn: Int!) {
+      getBooking(sn:$sn)
+      {
+        sn
+        name
+        phone
+        timestamp
+      }
+    }`;
+
+    const data = await graphQLFetch(query, { sn });
+    return data.getBooking; // None if not found
   }
 
-  removeBooking(sn) {
-    const newBookings = this.state.bookings.filter(
-      (booking) => booking.sn != sn
-    );
-    this.setState({ bookings: newBookings });
+  async removeBooking(sn) {
+    const query = `mutation deleteBooking($sn: Int!) {
+        deleteBooking(sn:$sn)
+    }`;
+
+    const data = await graphQLFetch(query, { sn });
+    if (data) {
+      console.log(data.deleteBooking);
+      this.loadData();
+    }
+  }
+
+  async clearBookings() {
+    const query = `mutation {
+      clearBookings
+    }`;
+
+    const data = await graphQLFetch(query);
+    if (data) {
+      console.log(data.clearBookings);
+      this.loadData();
+    }
   }
 
   render() {
@@ -123,6 +194,18 @@ class BookingSystem extends React.Component {
                 >
                   <div className="fs-4">Delete</div>
                 </button>
+                <button
+                  className="nav-link"
+                  id="nav-blacklist-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#nav-blacklist"
+                  type="button"
+                  role="tab"
+                  aria-controls="nav-blacklist"
+                  aria-selected="false"
+                >
+                  <div className="fs-4">Blacklist</div>
+                </button>
               </div>
             </nav>
             <div className="tab-content p-3" id="nav-tabContent">
@@ -163,6 +246,14 @@ class BookingSystem extends React.Component {
                   removeBooking={this.removeBooking}
                 />
               </div>
+              <div
+                className="tab-pane fade"
+                id="nav-blacklist"
+                role="tabpanel"
+                aria-labelledby="nav-blacklist-tab"
+              >
+                <BlackList />
+              </div>
             </div>
           </div>
         </div>
@@ -199,7 +290,7 @@ function BookingRow(props) {
       <th scope="row">{booking.sn}</th>
       <td>{booking.name}</td>
       <td>{booking.phone}</td>
-      <td>{booking.timestamp.toISOString()}</td>
+      <td>{booking.timestamp.toLocaleString()}</td>
     </tr>
   );
 }
@@ -257,16 +348,16 @@ class AddTraveller extends React.Component {
   handleSubmit(e) {
     e.preventDefault();
     const form = document.forms.newBookingForm;
-    if (form.name.value === "" || form.phone.value === "") {
-      alert("Invalid Input, please try again");
-      return;
-    }
+    // if (form.name.value === "" || form.phone.value === "") {
+    //   alert("Invalid Input, please try again");
+    //   return;
+    // }
 
     const booking = {
       name: form.name.value,
       phone: form.phone.value,
-      timestamp: new Date(),
     };
+
     this.props.addBooking(booking);
     form.name.value = "";
     form.phone.value = "";
@@ -337,7 +428,7 @@ class DeleteTraveller extends React.Component {
     });
   }
 
-  handleSearch(e) {
+  async handleSearch(e) {
     e.preventDefault();
     const searchForm = document.forms.searchBookingForm;
     if (searchForm.sn.value === "") {
@@ -345,8 +436,8 @@ class DeleteTraveller extends React.Component {
       return;
     }
 
-    const searchBooking = this.props.searchBooking(searchForm.sn.value);
-    if (searchBooking !== undefined) {
+    const searchBooking = await this.props.searchBooking(+searchForm.sn.value);
+    if (searchBooking) {
       this.setState({
         ...this.state,
         showSearchForm: false,
@@ -357,7 +448,7 @@ class DeleteTraveller extends React.Component {
       deleteForm.sn.value = searchBooking.sn;
       deleteForm.name.value = searchBooking.name;
       deleteForm.number.value = searchBooking.phone;
-      deleteForm.timestamp.value = searchBooking.timestamp.toISOString();
+      deleteForm.timestamp.value = searchBooking.timestamp.toLocaleString();
       searchForm.sn.value = "";
     } else {
       this.setState({
@@ -370,9 +461,9 @@ class DeleteTraveller extends React.Component {
     }
   }
 
-  handleDelete(e) {
+  async handleDelete(e) {
     e.preventDefault();
-    this.props.removeBooking(this.state.snPendingDelete);
+    await this.props.removeBooking(this.state.snPendingDelete);
     window.alert(`Booking ${this.state.snPendingDelete} deleted successfully`);
     this.resetState();
   }
@@ -478,6 +569,88 @@ class DeleteTraveller extends React.Component {
               onClick={() => this.handleCancel()}
             >
               Cancel
+            </button>
+          </div>
+        </form>
+      </>
+    );
+  }
+}
+
+class BlackList extends React.Component {
+  constructor() {
+    super();
+  }
+
+  async handleSubmit(e) {
+    e.preventDefault();
+    const form = document.forms.addBlacklistForm;
+    const blacklist = {};
+
+    if (form.name.value) blacklist["name"] = form.name.value.toUpperCase();
+    if (form.phone.value) blacklist["phone"] = form.phone.value;
+
+    const query = `mutation addBlackList($blacklist: BlackListInputs!) {
+      addBlackList(blacklist: $blacklist)
+      {
+        name
+        phone
+      }
+    }`;
+
+    const data = await graphQLFetch(query, { blacklist });
+    if (data) {
+      const { name, phone } = data.addBlackList;
+      alert(
+        `added to blacklist\n${name ? `name: ${name}\n` : ""}${
+          phone ? `phone: ${phone}\n` : ""
+        }`
+      );
+    }
+
+    form.name.value = "";
+    form.phone.value = "";
+  }
+
+  render() {
+    return (
+      <>
+        <form
+          name="addBlacklistForm"
+          onSubmit={this.handleSubmit}
+          autoComplete="off"
+        >
+          <div className="mb-3">
+            <legend>Blacklist</legend>
+            <h6 className="text-danger">
+              Add user to blacklist by giving either name or phone or both
+            </h6>
+          </div>
+          <div className="row mb-3">
+            <div className="form-group col-md-6">
+              <label htmlFor="inputBlacklistName">Name</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputBlacklistName"
+                name="name"
+                placeholder="Name"
+              />
+            </div>
+            <div className="form-group col-md-6">
+              <label htmlFor="inputBlacklistPhone">Phone</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputBlacklistPhone"
+                name="phone"
+                placeholder="Phone"
+              />
+            </div>
+          </div>
+          <div className="d-grid mb-3">
+            <button type="submit" className="btn btn-danger">
+              Add Blacklist
             </button>
           </div>
         </form>
