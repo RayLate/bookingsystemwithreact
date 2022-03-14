@@ -114,7 +114,7 @@ async function addBooking(_, { booking }) {
     blacklist.find((blacklistEntry) => blacklistEntry.name === booking.name)
   ) {
     throw new ForbiddenError(
-      `"NAME: ${booking.name}" is on the blacklist, barred from travelling`
+      `NAME: "${booking.name}" is on the blacklist, barred from travelling`
     );
   }
   if (
